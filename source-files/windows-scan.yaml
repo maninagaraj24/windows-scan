@@ -1,0 +1,42 @@
+---
+- hosts: 192.168.2.0
+  gather_facts: false
+  tasks:
+  - set_fact: date="{{lookup('pipe','date +%Y-%m-%d')}}"
+  - debug: var=date
+
+  - name: COPY SCRIPT
+    win_copy:
+            src: /opt/windows-scan/source-files/{{ item }}.bat
+            dest: C:\Users\{{ansible_user}}\
+    with_items:
+        - firewall
+        - hostfile
+        - admingroup
+        - basicuserinfo
+        - interfaces
+        - shares
+        - uac
+        - usedport
+  - name: COPY PS
+    win_copy:
+            src: /opt/windows-scan/source-files/ps_1.ps1
+            dest: C:\Users\{{ansible_user}}\
+
+  - name: RUN
+    win_shell: . C:\Users\{{ansible_user}}\ps_1.ps1        
+
+  - name: RUN SCRIPT
+    win_shell: C:\Users\{{ansible_user}}\{{item}}.bat > C:\Users\{{ansible_user}}\{{ item }}.txt
+
+    with_items:
+        - firewall
+        - hostfile
+        - admingroup
+        - basicuserinfo
+        - interfaces
+        - shares
+        - uac
+        - usedport
+
+
